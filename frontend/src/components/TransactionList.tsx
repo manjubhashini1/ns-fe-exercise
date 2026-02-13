@@ -1,33 +1,29 @@
 import React, { useEffect, useState } from 'react';
+import { mockTransactions } from '../mockdata';
+import { Transaction, transactionType } from '../interfaces';
+import Dropdown from './dropdown';
 
-interface Transaction {
-  id: number;
-  description: string;
-  amount: number;
-  type: string;
-  category_rel: {
-    id: number;
-    name: string;
-  };
-  date: string;
-  user_id: number;
-}
+
+
 
 const TransactionList: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<transactionType>('all');
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
         setLoading(true);
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const response = await fetch(`${backendUrl}/api/v1/transactions/`);
+        const response = await fetch(`http://localhost:8000/api/v1/transactions/`);
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data: Transaction[] = await response.json();
+        //const data: Transaction[] = await response.json();
+        const data: Transaction[] = mockTransactions;
         setTransactions(data);
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : 'An error occurred');
@@ -38,6 +34,8 @@ const TransactionList: React.FC = () => {
 
     fetchTransactions();
   }, []);
+
+  const filteredTransactions = filterType === 'all' ? transactions : transactions.filter((t)=> t.type === filterType);
 
   if (loading) {
     return <div className="text-gray-700">Loading transactions...</div>;
@@ -57,14 +55,16 @@ const TransactionList: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">Date</th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Type</th>
+              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]"><span className="flex items-center justify-center">
+                <p className="mr-3">Type</p> 
+                <Dropdown value={filterType} onChange={(value)=>setFilterType(value)}/></span></th>
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Category</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[35%]">Description</th>
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Amount</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {transactions.map((transaction, index) => (
+            {filteredTransactions.map((transaction, index) => (
               <tr key={transaction.id} className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                   {new Date(transaction.date).toLocaleDateString()}
