@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from 'react';
-
-interface Transaction {
-  id: number;
-  description: string;
-  amount: number;
-  type: string;
-  category_rel: {
-    id: number;
-    name: string;
-  };
-  date: string;
-  user_id: number;
-}
+import { mockTransactions } from '../mockdata';
+import { Transaction, transactionType } from '../interfaces';
 
 const TransactionList: React.FC = () => {
+  console.log('TransactionList component rendered');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,11 +13,11 @@ const TransactionList: React.FC = () => {
       try {
         setLoading(true);
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const response = await fetch(`${backendUrl}/api/v1/transactions/`);
+        const response = await fetch(`http://localhost:8000/api/v1/transactions/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data: Transaction[] = await response.json();
+        const data: Transaction[] = mockTransactions;
         setTransactions(data);
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : 'An error occurred');
@@ -37,7 +27,7 @@ const TransactionList: React.FC = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [mockTransactions]);
 
   if (loading) {
     return <div className="text-gray-700">Loading transactions...</div>;
@@ -99,4 +89,4 @@ const TransactionList: React.FC = () => {
   );
 };
 
-export default TransactionList;
+export default React.memo(TransactionList);
