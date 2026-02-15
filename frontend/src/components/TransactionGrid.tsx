@@ -41,7 +41,7 @@ const TransactionGrid = () => {
     []
   );
   const totalPages = Math.ceil(total / pageSize) || 1;
-  
+
   // Handle pagination
   const nextPage = useCallback(() => {
     if (page < totalPages) {
@@ -66,7 +66,16 @@ const TransactionGrid = () => {
   return (
     <div>
       {error && <div className="px-4 py-3 text-red-500">Error: {error}</div>}
+
       <div className="flex items-center justify-end mb-4">
+        <div>
+          <button
+            onClick={()=> refresh()}
+            className="px-4 py-2 bg-gray-200 rounded-md mr-2 cursor-pointer"
+          >
+            Refresh
+          </button>
+        </div>
         <button onClick={prevPage} className="px-4 py-2 bg-gray-200 rounded-md mr-2 cursor-pointer">
           Prev
         </button>
