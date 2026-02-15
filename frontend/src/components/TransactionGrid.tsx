@@ -87,7 +87,7 @@ const TransactionGrid = () => {
 
       <div className="w-full overflow-x-auto">
         <table className="w-full table-fixed border-collapse divide-y divide-gray-200">
-          <GridHeader columns={columns} onSort={handleSort} sortBy={sortBy} />
+          <GridHeader columns={columns} onSort={handleSort} sortOrder={sortOrder} />
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               Array.from({ length: 5 }).map((_, rowIdx) => (

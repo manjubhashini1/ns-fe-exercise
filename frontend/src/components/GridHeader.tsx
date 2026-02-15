@@ -1,9 +1,9 @@
 import React from 'react';
 import SortBy from '../interfaces/sortBy';
 
-const GridHeader = ({ columns, onSort }) => {
-  return (   
-      <thead className="bg-gray-50">
+const GridHeader = ({ columns, onSort, sortOrder }) => {
+  return (
+    <thead className="bg-gray-50">
       <tr>
         {columns.map((col) => (
           <th
@@ -17,13 +17,18 @@ const GridHeader = ({ columns, onSort }) => {
               disabled={!col.sortable}
               type="button"
             >
-              <span>{col.label}</span> {col.sortable && <span>&#8645;</span>}
+              <span>{col.label}</span>{' '}
+              {col.sortable && (
+                <>
+                  <span>&#8645;</span>
+                  <span>({sortOrder})</span>
+                </>
+              )}
             </button>
           </th>
         ))}
       </tr>
     </thead>
-
   );
 };
 
