@@ -1,11 +1,12 @@
 import React from 'react';
 import { useMemo, useState, useCallback } from 'react';
-import useFetchBaseData from '../useFetchBaseData';
+import useFetchBaseData from '../hooks/useFetchBaseData';
 import Tagpill from './Tagpill';
 import { SortBy, SortOrder } from '../types';
 import GridHeader from './GridHeader';
 
 const TransactionGrid = () => {
+  console.log('TransactionGrid component rendered');
   const [sortBy, setSortBy] = useState<SortBy>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [page, setPage] = useState(1);
@@ -49,11 +50,19 @@ const TransactionGrid = () => {
     <div>
       {error && <div className="px-4 py-3 text-red-500">Error: {error}</div>}
       <div className="flex items-center justify-end mb-4">
-        <button onClick={prevPage} className="px-4 py-2 bg-gray-200 rounded-md mr-2 cursor-pointer">
+        <button 
+          onClick={prevPage} 
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-200 rounded-md mr-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Prev
         </button>
         <p>{`Page ${page} of ${totalPages}`}</p>
-        <button onClick={nextPage} className="px-4 py-2 bg-gray-200 rounded-md ml-2 cursor-pointer">
+        <button 
+          onClick={nextPage} 
+          disabled={page >= totalPages}
+          className="px-4 py-2 bg-gray-200 rounded-md ml-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Next
         </button>
       </div>
@@ -125,4 +134,4 @@ const TransactionGrid = () => {
   );
 };
 
-export default TransactionGrid;
+export default React.memo(TransactionGrid);
