@@ -26,7 +26,7 @@ import {
  * const { data, ...rest } = useDataGrid<Transaction>({
  *   apiUrl: 'https://api.example.com/transactions/grid',
  *   pageSize: 10,
- *   filters: { type: 'debit', category: 'food' } //if api supports
+ *   filters: { type: 'debit' } //if api supports
  * });
  */
 
@@ -74,6 +74,8 @@ function useDataGrid<T = any>(config: UseDataGridConfig): UseDataGridReturn<T> {
     switch (action.type) {
       case 'SET_PAGE':
         return { ...state, page: action.payload };
+      case 'SET_PAGE_SIZE':
+        return { ...state, pageSize: action.payload, page: 1 };
       case 'SET_SORT':
         return { ...state, ...action.payload, page: 1 }; // Reset to page 1 on sort change
       case 'SET_LOADING':
@@ -105,8 +107,6 @@ function useDataGrid<T = any>(config: UseDataGridConfig): UseDataGridReturn<T> {
         dispatch({ type: 'SET_ERROR', payload: null });
 
         const url = new URL(apiUrl);
-
-        console.log(state.loading, url);
         url.searchParams.set('page', String(state.page));
         url.searchParams.set('size', String(state.pageSize));
         url.searchParams.set('sort_by', state.sortBy);
@@ -156,6 +156,12 @@ function useDataGrid<T = any>(config: UseDataGridConfig): UseDataGridReturn<T> {
     [state.total, state.pageSize]
   );
 
+  // Memoized callback to set page size
+  const setPageSize = useCallback((newSize: number) => {
+    const size = Math.max(1, Math.floor(newSize));
+    dispatch({ type: 'SET_PAGE_SIZE', payload: size });
+  }, []);
+
   // Memoized callback to set sort
   // Toggles sort order if same column is clicked, otherwise sets new column with 'desc' order
   const setSort = useCallback(
@@ -185,6 +191,7 @@ function useDataGrid<T = any>(config: UseDataGridConfig): UseDataGridReturn<T> {
     error: state.error,
     setPage,
     setSort,
+    setPageSize,
     refresh,
   };
 }

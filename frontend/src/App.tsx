@@ -17,7 +17,7 @@ function App() {
       <Header onUserProfileClick={handleUserProfileClick} />
       <main className="flex-grow container mx-auto p-4">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">FinTech Dashboard</h1>
-        <p className="text-gray-600">User Activity: {userActivityCount}</p>
+        <p className="text-gray-600 mb-10">User Activity: {userActivityCount}</p>
   
         <TransactionGrid />
       </main>

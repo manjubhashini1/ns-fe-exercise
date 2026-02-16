@@ -2,11 +2,15 @@ import React from 'react';
 import { useMemo, useCallback } from 'react';
 import useDataGrid from '../hooks/useDataGrid';
 import Tagpill from './Tagpill';
+import DropdownSelector from './DropdownSelector';
+import { TRANSACTION_TYPES } from '../interfaces';
 import { SortBy, SortOrder } from '../types';
 import GridHeader from './GridHeader';
 
 const TransactionGrid = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+  const [typeFilter, setTypeFilter] = React.useState<string>('all');
 
   // Initialize the data grid hook with API endpoint and configuration
   const {
@@ -20,12 +24,14 @@ const TransactionGrid = () => {
     error,
     setPage,
     setSort,
+    setPageSize,
     refresh,
   } = useDataGrid<any>({
     apiUrl: `${backendUrl}/api/v1/transactions/grid`,
     pageSize: 5,
     initialSortBy: 'date',
     initialSortOrder: 'asc',
+    filters: { type: typeFilter === 'all' ? undefined : typeFilter },
   });
 
   const transactions = data ?? [];
@@ -55,6 +61,16 @@ const TransactionGrid = () => {
     }
   }, [page, setPage]);
 
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1); // Reset to page 1 when size changes
+  };
+
+  const handleTypeChange = (newType: string) => {
+    setTypeFilter(newType);
+    setPage(1);
+  };
+
   // Handle sorting - toggle order if same column, otherwise set new column
   const handleSort = useCallback(
     (key: SortBy) => {
@@ -67,20 +83,42 @@ const TransactionGrid = () => {
     <div>
       {error && <div className="px-4 py-3 text-red-500">Error: {error}</div>}
 
-      <div className="flex items-center justify-end mb-4">
+      <div className="flex items-center justify-end mb-4 gap-4">
+        <DropdownSelector
+          value={pageSize}
+          options={[5, 10, 20].map((v) => ({ value: v, label: String(v) }))}
+          onChange={handlePageSizeChange}
+          id="page-size"
+          label="Page Size:"
+        />
+        <DropdownSelector
+          value={typeFilter}
+          options={TRANSACTION_TYPES.map((t) => ({ value: t, label: t }))}
+          onChange={handleTypeChange}
+          id="type-filter"
+          label="Type:"
+        />
         <div>
           <button
-            onClick={()=> refresh()}
+            onClick={() => refresh()}
             className="px-4 py-2 bg-gray-200 rounded-md mr-2 cursor-pointer"
           >
             Refresh
           </button>
         </div>
-        <button onClick={prevPage} className="px-4 py-2 bg-gray-200 rounded-md mr-2 cursor-pointer">
+        <button
+          onClick={prevPage}
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-200 rounded-md mr-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Prev
         </button>
         <p>{`Page ${page} of ${totalPages}`}</p>
-        <button onClick={nextPage} className="px-4 py-2 bg-gray-200 rounded-md ml-2 cursor-pointer">
+        <button
+          onClick={nextPage}
+          disabled={page >= totalPages}
+          className="px-4 py-2 bg-gray-200 rounded-md ml-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Next
         </button>
       </div>

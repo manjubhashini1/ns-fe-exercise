@@ -43,10 +43,11 @@ export interface GridState<T> {
   error: string | null;
 }
 
-export type GridAction<T> = 
-    { type: 'SET_PAGE'; payload: number }
+export type GridAction<T> =
+  | { type: 'SET_PAGE'; payload: number }
   | { type: 'SET_SORT'; payload: SortConfig }
   | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_PAGE_SIZE'; payload: number }
   | { type: 'SET_DATA'; payload: { data: T[]; total: number } }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' };
@@ -71,5 +72,6 @@ export interface UseDataGridReturn<T> {
   error: string | null;
   setPage: (page: number) => void;
   setSort: (sortBy: string) => void;
+  setPageSize: (size: number) => void;
   refresh: () => void;
 }
