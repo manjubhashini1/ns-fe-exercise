@@ -17,13 +17,12 @@ const TransactionList: React.FC = () => {
       try {
         setLoading(true);
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const response = await fetch(`http://localhost:8000/api/v1/transactions/`);
+        const response = await fetch(`${backendUrl}/api/v1/transactions/`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        //const data: Transaction[] = await response.json();
-        const data: Transaction[] = mockTransactions;
+        const data: Transaction[] = await response.json();
         setTransactions(data);
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : 'An error occurred');
